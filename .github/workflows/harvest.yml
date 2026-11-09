@@ -40,7 +40,7 @@ jobs:
           ARGS="--institute $INSTITUTE --workers 3 --out data/szaok_data.json"
           if [ -f data/szaok_author_ids.txt ]; then ARGS="--authors data/szaok_author_ids.txt --workers 3 --out data/szaok_data.json"; fi
           if [ -n "$REF_YEAR" ]; then ARGS="$ARGS --ref-year $REF_YEAR"; fi
-          python harvest_mtmt.py $ARGS
+          python -u harvest_mtmt.py $ARGS
           if [ -f szaok_author_ids.txt ]; then mv szaok_author_ids.txt data/szaok_author_ids_felderitett.txt; fi
       - name: Adat commitolása
         run: |
