@@ -1,0 +1,64 @@
+name: MTMT harvest + GitHub Pages
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1"   # hétfő 03:00 UTC – heti frissítés
+  push:
+    branches: [main]
+    paths: ["index.html", "harvest_mtmt.py", ".github/workflows/harvest.yml"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install requests
+      - name: MTMT rekord-cache visszatöltése
+        uses: actions/cache@v4
+        with:
+          path: cache
+          key: mtmt-cache-${{ github.run_id }}
+          restore-keys: mtmt-cache-
+      - name: Letöltés és számítás
+        env:
+          INSTITUTE: ${{ vars.MTMT_INSTITUTE_ID || 'auto' }}
+          REF_YEAR: ${{ vars.REF_YEAR || '' }}
+        run: |
+          ARGS="--institute $INSTITUTE --workers 3 --out data/szaok_data.json"
+          if [ -f data/szaok_author_ids.txt ]; then ARGS="--authors data/szaok_author_ids.txt --workers 3 --out data/szaok_data.json"; fi
+          if [ -n "$REF_YEAR" ]; then ARGS="$ARGS --ref-year $REF_YEAR"; fi
+          python harvest_mtmt.py $ARGS
+          if [ -f szaok_author_ids.txt ]; then mv szaok_author_ids.txt data/szaok_author_ids_felderitett.txt; fi
+      - name: Adat commitolása
+        run: |
+          git config user.name "szaok-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "MTMT adatfrissítés $(date -u +%F)"
+          git push
+      - name: Pages csomag
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+  deploy:
+    needs: harvest
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

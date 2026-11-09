@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SZAOK Tudománymetria – kari rangsor pályaév szerint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4F6F8; --panel:#FFFFFF; --ink:#16222C; --ink-2:#4A5967; --ink-3:#7E8B97;
+  --rule:#D6DDE3; --rule-2:#E8ECF0;
+  --navy:#1C3D66; --navy-2:#2E5A8F; --teal:#1F8A86; --gold:#C98A17; --red:#B8433A;
+  --band-100:#CFDCEB; --band-90:#A7BFDC; --band-75:#7FA2CB; --band-50:#2E5A8F;
+  --self:#C98A17;
+  --focus:#1F8A86;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#111820; --panel:#18222C; --ink:#E6ECF1; --ink-2:#B3BFCA; --ink-3:#7F8C98;
+    --rule:#2A3742; --rule-2:#202B35;
+    --navy:#8FB4E0; --navy-2:#6D97CA; --teal:#49B2AD; --gold:#E0A63B; --red:#E0776D;
+    --band-100:#223246; --band-90:#2B4260; --band-75:#355578; --band-50:#6D97CA;
+    --self:#E0A63B;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#111820; --panel:#18222C; --ink:#E6ECF1; --ink-2:#B3BFCA; --ink-3:#7F8C98;
+  --rule:#2A3742; --rule-2:#202B35;
+  --navy:#8FB4E0; --navy-2:#6D97CA; --teal:#49B2AD; --gold:#E0A63B; --red:#E0776D;
+  --band-100:#223246; --band-90:#2B4260; --band-75:#355578; --band-50:#6D97CA;
+  --self:#E0A63B;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--navy)}
+h1,h2,h3{font-family:"Newsreader",Georgia,serif;font-weight:500;letter-spacing:-.005em;margin:0}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.1}
+h2{font-size:24px;line-height:1.2}
+h3{font-size:18px;line-height:1.3}
+.num{font-family:"Newsreader",Georgia,serif;font-variant-numeric:tabular-nums lining-nums}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* header */
+header.top{border-bottom:1px solid var(--rule);background:var(--panel)}
+header.top .wrap{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-top:26px;padding-bottom:18px}
+.brand small{display:block;color:var(--ink-2);margin-top:6px;max-width:62ch}
+.status{font-size:13px;color:var(--ink-2);text-align:right}
+.status b{color:var(--ink);font-weight:600}
+.status .demo{color:var(--red);font-weight:600}
+
+nav.tabs{background:var(--panel);border-bottom:1px solid var(--rule);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--panel)}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
+nav.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:12px 14px 10px;color:var(--ink-2);white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--navy)}
+nav.tabs button:hover{color:var(--ink)}
+
+main .wrap{padding-top:28px;padding-bottom:60px}
+section[hidden]{display:none}
+
+/* controls */
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:13px;color:var(--ink-2)}
+input[type=text],input[type=search],input[type=number],select{
+  background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:9px 12px;min-width:200px}
+input[type=number]{min-width:90px}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:6px;padding:10px 16px;font-weight:500}
+:root[data-theme="dark"] .btn,:root:not([data-theme="light"]) .btn{color:var(--paper)}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .btn{color:#fff}}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.btn.small{padding:6px 10px;font-size:13px}
+.check{display:inline-flex;gap:8px;align-items:center;font-size:14px;color:var(--ink-2)}
+.suggest{position:relative}
+.suggest ul{position:absolute;z-index:4;left:0;right:0;top:100%;margin:4px 0 0;padding:4px 0;list-style:none;background:var(--panel);border:1px solid var(--rule);border-radius:6px;max-height:280px;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.suggest li{padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:12px}
+.suggest li:hover,.suggest li[aria-selected=true]{background:var(--rule-2)}
+.suggest li span{color:var(--ink-3);font-size:13px}
+
+/* researcher head */
+.who{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 32px;align-items:flex-end;margin:28px 0 8px}
+.who .meta{color:var(--ink-2);font-size:14px}
+.who .meta a{color:inherit}
+.decile{font-family:"Newsreader",serif;font-size:64px;line-height:1;font-weight:500;color:var(--navy)}
+.decile small{display:block;font-family:"IBM Plex Sans",sans-serif;font-size:13px;color:var(--ink-2);margin-top:4px}
+
+/* the ruler – the one memorable element */
+.ruler{margin:18px 0 6px;padding:18px 0 10px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.ruler svg{width:100%;height:auto;display:block}
+.ruler .legend{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:13px;color:var(--ink-2);margin-top:8px}
+.ruler .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+
+.scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0 28px;margin:14px 0 24px}
+.score{padding:12px 0;border-bottom:1px solid var(--rule-2)}
+.score .lab{font-size:13px;color:var(--ink-2)}
+.score .val{font-family:"Newsreader",serif;font-size:30px;line-height:1.1;margin-top:2px}
+.score .sub{font-size:13px;color:var(--ink-3)}
+.score.total .val{color:var(--navy)}
+
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px 28px}
+.chart h3{margin-bottom:4px}
+.chart p{margin:0 0 8px;font-size:13px;color:var(--ink-2)}
+.chart svg{width:100%;height:auto;display:block;background:var(--panel);border:1px solid var(--rule);border-radius:6px}
+.chart .cap{font-size:12px;color:var(--ink-3);margin-top:6px}
+
+.empty{color:var(--ink-2);padding:40px 0;max-width:62ch}
+.note{font-size:13px;color:var(--ink-2);max-width:72ch}
+
+/* tables */
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--panel);margin-top:16px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--rule-2);white-space:nowrap}
+th{font-weight:500;color:var(--ink-2);background:var(--panel);position:sticky;top:0;cursor:pointer;user-select:none}
+th.sorted{color:var(--ink)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.me td{background:color-mix(in srgb,var(--gold) 14%,transparent)}
+td .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600;background:var(--rule-2);color:var(--ink)}
+td .pill.d1{background:var(--navy);color:var(--paper)}
+td .pill.d2,td .pill.d3{background:var(--band-75);color:var(--ink)}
+tbody tr:hover td{background:color-mix(in srgb,var(--navy) 6%,transparent)}
+tr.me:hover td{background:color-mix(in srgb,var(--gold) 20%,transparent)}
+.rank{color:var(--ink-3)}
+
+.method{max-width:72ch}
+.method p,.method li{color:var(--ink-2)}
+.method h3{margin:26px 0 8px;color:var(--ink)}
+.method code{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:var(--rule-2);padding:1px 5px;border-radius:4px}
+.method .formula{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;margin:12px 0;font-family:"Newsreader",serif;font-size:17px}
+.method table{font-size:13px;margin:10px 0}
+.method th{cursor:default;position:static}
+.method td{white-space:normal}
+
+.drop{border:1.5px dashed var(--rule);border-radius:8px;padding:28px;text-align:center;color:var(--ink-2);background:var(--panel)}
+.drop.over{border-color:var(--teal);color:var(--ink)}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:6px 18px;font-size:14px;margin-top:16px}
+.kv div:nth-child(odd){color:var(--ink-2)}
+pre{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;overflow:auto;font-size:12.5px;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:6px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media (max-width:640px){.who{align-items:flex-start}.decile{font-size:48px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <h1>SZAOK Tudománymetria</h1>
+      <small>A Szent-Györgyi Albert Orvostudományi Kar kutatóinak publikációs teljesítménye a kar azonos pályaévű kutatóihoz mérve – a tudomanymetria.com módszertanával, országos helyett kari viszonyítási alappal.</small>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <div class="wrap">
+    <button role="tab" data-tab="kutato" aria-selected="true">Kutató</button>
+    <button role="tab" data-tab="toplista" aria-selected="false">Toplista pályaév szerint</button>
+    <button role="tab" data-tab="osszehasonlitas" aria-selected="false">Összehasonlítás</button>
+    <button role="tab" data-tab="modszertan" aria-selected="false">Módszertan</button>
+    <button role="tab" data-tab="adatok" aria-selected="false">Adatok</button>
+  </div>
+</nav>
+
+<main><div class="wrap">
+
+<!-- ====================== KUTATÓ ====================== -->
+<section id="tab-kutato">
+  <div class="row">
+    <div class="field suggest" style="flex:1 1 320px">
+      <label for="q">Név vagy MTMT-azonosító</label>
+      <input type="search" id="q" placeholder="pl. Kovács vagy 10073667" autocomplete="off">
+      <ul id="sug" hidden></ul>
+    </div>
+    <div class="field">
+      <label for="ageAt">Pályaév (üresen: aktuális)</label>
+      <input type="number" id="ageAt" min="1" max="60" placeholder="aktuális">
+    </div>
+    <label class="check" style="margin-top:18px"><input type="checkbox" id="useBreak"> pályakihagyás (MTMT) figyelembevétele</label>
+    <label class="check" style="margin-top:18px"><input type="checkbox" id="logY" checked> logaritmikus y (idézet, Q1)</label>
+  </div>
+  <div id="person"></div>
+</section>
+
+<!-- ====================== TOPLISTA ====================== -->
+<section id="tab-toplista" hidden>
+  <div class="row">
+    <div class="field">
+      <label for="topAge">Pályaév</label>
+      <select id="topAge"></select>
+    </div>
+    <div class="field">
+      <label for="topFilter">Szűrés névre / szervezeti egységre</label>
+      <input type="search" id="topFilter" placeholder="pl. Klinika">
+    </div>
+    <div class="field">
+      <label for="topN">Megjelenített sorok</label>
+      <select id="topN"><option>25</option><option>50</option><option selected>100</option><option value="0">mind</option></select>
+    </div>
+    <button class="btn ghost" id="topCsv" style="margin-top:18px">CSV letöltése</button>
+  </div>
+  <p class="note" id="topNote"></p>
+  <div class="tablewrap"><table id="topTable"></table></div>
+</section>
+
+<!-- ====================== ÖSSZEHASONLÍTÁS ====================== -->
+<section id="tab-osszehasonlitas" hidden>
+  <div class="row">
+    <div class="field" style="flex:1 1 320px">
+      <label for="cmpIds">MTMT-azonosítók (vesszővel, szóközzel vagy soronként)</label>
+      <input type="text" id="cmpIds" placeholder="10073667, 10001234, 10005678">
+    </div>
+    <button class="btn" id="cmpRun" style="margin-top:18px">Összehasonlítás</button>
+    <button class="btn ghost" id="cmpCsv" style="margin-top:18px">CSV letöltése</button>
+  </div>
+  <p class="note">Mindenkit a saját aktuális pályaévének megfelelő kari referenciához mérünk – így egy 8 és egy 30 pályaéves kutató percentilise közvetlenül összevethető.</p>
+  <div id="cmpOut"></div>
+</section>
+
+<!-- ====================== MÓDSZERTAN ====================== -->
+<section id="tab-modszertan" hidden>
+  <div class="method">
+    <h2>Hogyan számolunk?</h2>
+    <p>Az eljárás a <a href="https://tudomanymetria.com" target="_blank" rel="noopener">tudomanymetria.com</a> (Scientometrics.org) publikált módszertanát követi (Győrffy B., Weltz B., Munkácsy Gy., Herman P., Szabó I.: <em>Methodology</em> 2022;18(4):278–297, <a href="https://doi.org/10.5964/meth.9463" target="_blank" rel="noopener">doi:10.5964/meth.9463</a>), egyetlen eltéréssel: a referenciahalmaz nem a magyar orvostudomány egésze, hanem a SZAOK kutatói. Minden kutatót a kar azonos vagy magasabb pályaévet elért kutatóinak <em>ugyanabban a pályaévben</em> mért értékeihez hasonlítunk.</p>
+
+    <h3>Alapfogalmak</h3>
+    <ul>
+      <li><strong>Pályaév (publikációs kor):</strong> referenciaév − az első tudományos folyóiratcikk éve. A referenciaév az utolsó teljes naptári év. Az MTMT-ben rögzített pályakihagyás (pl. gyermekgondozás) opcionálisan levonható.</li>
+      <li><strong>Vizsgált közlemények:</strong> az MTA V. (Orvosi) osztály szabályai szerint csak lektorált folyóiratcikkek – szakcikk, összefoglaló cikk, rövid közlemény –, „Tudományos” besorolással.</li>
+      <li><strong>Vezető szerzőség:</strong> első, utolsó vagy levelező szerző az MTMT szerzőségi jelölése alapján (megosztott első/utolsó szerzőség is számít).</li>
+      <li><strong>Független idézet:</strong> az idéző és az idézett közlemény szerzőlistája nem fed át (MTMT-jelölés).</li>
+    </ul>
+
+    <h3>A négy mutató</h3>
+    <table>
+      <thead><tr><th>Mutató</th><th>Számítás az adott pályaév végén</th><th>Mit mér</th></tr></thead>
+      <tbody>
+        <tr><td>h-index</td><td>Összes (függő + független) idézet, az addig megjelent cikkekre</td><td>életmű, elsősorban produktivitás</td></tr>
+        <tr><td>Független idézet / év</td><td>Az adott évben kapott független idézetek, a vezető szerzős cikkek idézetei <strong>×2</strong></td><td>a múltbeli eredmények jelenbeli hatása</td></tr>
+        <tr><td>Vezető szerzős Q1 cikkek</td><td>Az utolsó 5 év első/utolsó/levelező szerzős cikkei SCImago Q1 (D1 is) besorolású folyóiratban</td><td>aktuális aktivitás, folyóiratrang</td></tr>
+        <tr><td>Kiemelkedő hatású cikkek</td><td>Az utolsó 10 év vezető szerzős cikkei, amelyek átlagosan legalább <strong>13 független idézet/évet</strong> kaptak (orvostudomány, NKFIH Élvonal-küszöb)</td><td>egyedi, nagy hatású eredmények</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Percentilis és összpontszám</h3>
+    <p>Egy <em>a</em> pályaévű kutató esetén a viszonyítási csoport a kar minden olyan kutatója, aki elérte az <em>a</em> pályaévet; tőlük is az <em>a</em>. pályaévben mért értéket vesszük. A percentilis a csoporton belüli rangsorból adódik (0 = leggyengébb, 100 = legjobb); azonos értékek a holtverseny középső percentilisét kapják.</p>
+    <div class="formula">Összpontszám = (P<sub>h</sub> + P<sub>idézet</sub> + 2 · P<sub>Q1</sub>) / 4 + 4 · N<sub>kiemelkedő</sub></div>
+    <p>A decilis az összpontszámból adódik: D1 = 90 felett (a kar legjobb tizede), D2 = 80–90 … D10 = 10 alatt. A kiemelkedő hatású cikkek miatt a pontszám 100 fölé is kerülhet.</p>
+
+    <h3>A toplista</h3>
+    <p>A „Toplista pályaév szerint” lap egy kiválasztott pályaévre rendezi sorba a kar összes olyan kutatóját, aki azt a pályaévet már elérte – mindenkit a saját pályafutásának ugyanazon évében mért értékei alapján. Ez így azt mutatja, ki hol tartott pályája adott évében a kari mezőnyhöz képest, függetlenül attól, hogy ma hány éve publikál. Az „aktuális” választás a mai állapotot adja.</p>
+
+    <h3>Eltérések a tudomanymetria.com-tól és korlátok</h3>
+    <ul>
+      <li>Referenciahalmaz: SZAOK-kutatók, nem az országos orvostudományi mezőny. Kisebb csoport → a percentilisek szórása nagyobb, kevés pályaévnél (pl. 35 felett) a holtversenyek és a kis elemszám torzítanak. A megjelenített n mindig ellenőrizendő.</li>
+      <li>A h-index itt kizárólag a folyóiratcikkekből számolódik (az MTMT összes közleménytípusa helyett), mert a kari adathalmaz csak folyóiratcikkeket tartalmaz.</li>
+      <li>A Q-besorolás az MTMT-ben rögzített SCImago SJR-érték a megjelenés évére (ha hiányzik, a legközelebbi év, végső soron a legjobb besorolás).</li>
+      <li>Nem szűrünk PhD-fokozatra; a tudomanymetria.com csak fokozattal rendelkezőket tart a referenciában. Az aktív/inaktív státuszra az MTMT utolsó módosítási dátuma használható a Toplista szűrőjében.</li>
+      <li>Általános kritika (Kamarás, Makara, Soós: <em>Magyar Tudomány</em> 2021/4): a módszer folyóiratrang-alapú, a vezető szerzőségre erősen épít, és nem kezeli a pályaváltásokat. A tudomanymetria.com útmutatása szerint döntéstámogató, nem a szakértői értékelés helyettesítője – ez a kari változatra ugyanúgy igaz.</li>
+    </ul>
+
+    <h3>Adatforrás és frissítés</h3>
+    <p>Az adatokat a mellékelt <code>harvest_mtmt.py</code> gyűjti az MTMT nyilvános API-járól (<code>m2.mtmt.hu/api</code>): a kar és alintézményei szerzőlistája, szerzőnként a folyóiratcikkek, cikkenként a szerzőségi pozíciók, az SJR-besorolás és az évenkénti (független) idézetszámok. A számítás eredménye egy JSON-fájl, amelyet az „Adatok” lapon lehet betölteni. A weboldal maga semmilyen szerverrel nem kommunikál.</p>
+  </div>
+</section>
+
+<!-- ====================== ADATOK ====================== -->
+<section id="tab-adatok" hidden>
+  <h2>Adatállomány</h2>
+  <p class="note" style="margin:8px 0 18px">Töltsd be a <code>harvest_mtmt.py</code> által készített JSON-t. A fájl a böngésződben marad (nem töltődik fel sehova), és a következő megnyitásig elmentjük helyben, ha a böngésző engedi.</p>
+  <div class="drop" id="drop">
+    Húzd ide a <strong>szaok_data.json</strong> fájlt, vagy
+    <label style="color:var(--navy);text-decoration:underline;cursor:pointer">válaszd ki<input type="file" id="file" accept=".json,application/json" hidden></label>.
+  </div>
+  <div class="kv" id="metaKv"></div>
+  <div class="row" style="margin-top:18px">
+    <button class="btn ghost" id="loadDemo">Demó adatok visszaállítása</button>
+    <button class="btn ghost" id="clearStore">Helyi mentés törlése</button>
+  </div>
+  <h3 style="margin-top:30px">A JSON szerkezete</h3>
+  <pre>{
+  "meta": { "institute": "...", "refYear": 2025, "hiThreshold": 13, ... },
+  "authors": [
+    { "mtid": 10073667, "name": "Bukva Mátyás", "dept": "…", "firstYear": 2017,
+      "careerBreak": 0, "lastModified": "2026-09-01",
+      "h":   [0, 1, 2, …],   // pályaévenként (index 0 = az első cikk éve)
+      "cit": [0, 3, 9, …],   // független idézet az adott évben (vezető szerzős ×2)
+      "q1":  [1, 2, 2, …],   // vezető szerzős Q1 cikk az utolsó 5 évben
+      "hi":  [0, 0, 1, …] }  // kiemelkedő hatású cikk az utolsó 10 évből
+  ]
+}</pre>
+</section>
+
+</div></main>
+<div class="toast" id="toast"></div>
+
+<script id="szaok-data" type="application/json">null</script>
+<script>
+'use strict';
+/* ============================ ÁLLAPOT ============================ */
+const S = { data:null, demo:false, idx:new Map(), poolCache:new Map(), sel:null, topSort:{key:'overall',dir:-1} };
+const $ = s => document.querySelector(s);
+const fmt = (x,d=0) => (x==null||isNaN(x)) ? '–' : Number(x).toLocaleString('hu-HU',{maximumFractionDigits:d,minimumFractionDigits:d});
+const toast = m => { const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2600); };
+
+/* ============================ DEMÓ ADAT ============================ */
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function makeDemo(){
+  const R=mulberry(20261109), refYear=2025;
+  const fam=['Nagy','Kovács','Tóth','Szabó','Horváth','Varga','Kiss','Molnár','Németh','Farkas','Balogh','Papp','Takács','Juhász','Lakatos','Mészáros','Oláh','Simon','Rácz','Fekete','Szűcs','Török','Fehér','Balázs','Gál','Kis','Szalai','Kocsis','Pintér','Fodor','Szilágyi','Orsós','Vincze','Hegedűs','Budai','Deák','Pap','Bogdán','Sipos','Vass'];
+  const giv=['Anna','Péter','Zoltán','Katalin','Gábor','Éva','László','Judit','István','Ágnes','Tamás','Eszter','Attila','Andrea','Balázs','Zsuzsanna','András','Mária','Dániel','Noémi','Gergely','Orsolya','Márton','Réka','Csaba','Viktória','Ádám','Krisztina','Bence','Dóra'];
+  const depts=['I. sz. Belgyógyászati Klinika','Sebészeti Klinika','Élettani Intézet','Orvosi Vegytani Intézet','Biokémiai Intézet','Neurológiai Klinika','Gyermekgyógyászati Klinika','Bőrgyógyászati és Allergológiai Klinika','Aneszteziológiai és Intenzív Terápiás Intézet','Orvosi Mikrobiológiai Intézet','Radiológiai Klinika','Pathológiai Intézet','Farmakológiai és Farmakoterápiai Intézet','Szemészeti Klinika','Népegészségtani Intézet','Orvosi Fizikai és Orvosi Informatikai Intézet','Szülészeti és Nőgyógyászati Klinika','Onkoterápiás Klinika','Pszichiátriai Klinika','Kórélettani Intézet'];
+  const gauss=()=>{let u=0,v=0;while(!u)u=R();while(!v)v=R();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+  const pois=l=>{let L=Math.exp(-l),k=0,p=1;do{k++;p*=R()}while(p>L);return k-1};
+  const authors=[];
+  for(let i=0;i<420;i++){
+    const years=1+Math.floor(Math.pow(R(),0.8)*44);
+    const firstYear=refYear-years;
+    const talent=Math.exp(gauss()*0.75-0.25);
+    const q1rate=0.05*talent*Math.exp(gauss()*0.5);
+    const h=[],cit=[],q1=[],hi=[];
+    let hv=0;
+    for(let a=0;a<=years;a++){
+      const g=0.35*talent*(1+0.12*gauss()); hv=Math.max(hv, Math.round(g*a)); h.push(hv);
+      const base=1.41*talent*a*(0.6+0.8*R()); cit.push(Math.max(0,Math.round(base*Math.exp(gauss()*0.25))));
+      q1.push(pois(q1rate*Math.min(a,25)*(a<2?0.3:1)));
+      hi.push(R()<0.04+0.02*Math.min(a,20)*talent/20?pois(0.9):0);
+    }
+    authors.push({mtid:10090000+i,name:fam[Math.floor(R()*fam.length)]+' '+giv[Math.floor(R()*giv.length)],
+      dept:depts[Math.floor(R()*depts.length)],firstYear,careerBreak:R()<0.12?1+Math.floor(R()*3):0,
+      lastModified:(2022+Math.floor(R()*5))+'-0'+(1+Math.floor(R()*9))+'-15',h,cit,q1,hi,npub:Math.round(2+years*3.2*talent),nlead:0});
+  }
+  authors.sort((a,b)=>a.name.localeCompare(b.name,'hu'));
+  return {meta:{institute:'SZTE Szent-Györgyi Albert Orvostudományi Kar (DEMÓ – szintetikus adatok)',refYear,generated:'2026-11-09',discipline:'V. Orvosi Tudományok',hiThreshold:13,leadWeight:2,q1Weight:2,hiMultiplier:4,source:'szintetikus mintaadat – nem valós kutatók',method:'Győrffy et al. 2022, doi:10.5964/meth.9463',nAuthors:authors.length},authors};
+}
+
+/* ============================ SZÁMÍTÁS ============================ */
+const METRICS=[
+  {key:'h',  label:'h-index',               short:'h',    log:false},
+  {key:'cit',label:'Független idézet / év', short:'idézet',log:true},
+  {key:'q1', label:'Vezető szerzős Q1 cikk (5 év)', short:'Q1', log:true},
+];
+function ageOf(a,useBreak){ const n=a.h.length-1; return useBreak? Math.max(0,n-(a.careerBreak||0)) : n; }
+function valAt(a,key,age,useBreak){ // age = referencia pályaév; kihagyásnál a tényleges index eltolódik
+  const idx=useBreak? age+(a.careerBreak||0) : age;
+  const arr=a[key]; return idx<arr.length? arr[idx] : null;
+}
+function pool(age,useBreak){
+  const k=age+'|'+(useBreak?1:0);
+  if(S.poolCache.has(k)) return S.poolCache.get(k);
+  const members=S.data.authors.filter(a=>ageOf(a,useBreak)>=age);
+  const sorted={};
+  for(const m of METRICS){ sorted[m.key]=members.map(a=>valAt(a,m.key,age,useBreak)).filter(v=>v!=null).sort((x,y)=>x-y); }
+  const out={members,sorted,n:members.length};
+  S.poolCache.set(k,out); return out;
+}
+function percentile(sortedArr,v){ // középrang-percentilis 0..100, 100=legjobb
+  const n=sortedArr.length; if(!n||v==null) return null;
+  let lo=0,hi=n; while(lo<hi){const m=(lo+hi)>>1; if(sortedArr[m]<v) lo=m+1; else hi=m;} const less=lo;
+  lo=0;hi=n; while(lo<hi){const m=(lo+hi)>>1; if(sortedArr[m]<=v) lo=m+1; else hi=m;} const eq=lo-less;
+  return 100*(less+0.5*eq)/n;
+}
+function quantile(sortedArr,p){ if(!sortedArr.length) return null; const i=(sortedArr.length-1)*p; const lo=Math.floor(i),hi=Math.ceil(i); return sortedArr[lo]+(sortedArr[hi]-sortedArr[lo])*(i-lo); }
+function evaluate(a,age,useBreak){
+  const P=pool(age,useBreak); const W=S.data.meta;
+  const vals={}, pct={};
+  for(const m of METRICS){ vals[m.key]=valAt(a,m.key,age,useBreak); pct[m.key]=percentile(P.sorted[m.key],vals[m.key]); }
+  const hiN=valAt(a,'hi',age,useBreak)||0;
+  const overall=(pct.h+pct.cit+(W.q1Weight||2)*pct.q1)/(2+(W.q1Weight||2))+(W.hiMultiplier||4)*hiN;
+  return {age,vals,pct,hi:hiN,overall,decile:decileOf(overall),n:P.n,year:S.data.meta.refYear-(ageOf(a,useBreak)-age)};
+}
+function decileOf(s){ return s>=90?1:Math.min(10,Math.max(1,10-Math.floor(s/10))); }
+function evalPool(age,useBreak){ return pool(age,useBreak).members.map(a=>({a,e:evaluate(a,age,useBreak)})); }
+
+/* ============================ SVG SEGÉD ============================ */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function chartSVG(m,a,age,useBreak,logY){
+  const W=560,H=300,L=48,Rr=14,T=16,B=36; const pw=W-L-Rr, ph=H-T-B;
+  const maxAge=Math.max(...S.data.authors.map(x=>ageOf(x,useBreak)));
+  const qs=[0,0.25,0.5,0.75,0.9,1];
+  const lines=qs.map(()=>[]);
+  let vmax=1;
+  for(let t=0;t<=maxAge;t++){ const sa=pool(t,useBreak).sorted[m.key]; if(sa.length<3) break;
+    qs.forEach((q,i)=>{ const v=quantile(sa,q); lines[i].push([t,v]); vmax=Math.max(vmax,v); }); }
+  const own=[]; for(let t=0;t<=ageOf(a,useBreak);t++){ const v=valAt(a,m.key,t,useBreak); if(v!=null){own.push([t,v]); vmax=Math.max(vmax,v);} }
+  const useLog=logY&&m.log;
+  const ylim=useLog? Math.pow(10,Math.ceil(Math.log10(vmax+1))) : Math.ceil(vmax*1.05);
+  const X=t=>L+pw*t/Math.max(1,maxAge);
+  const Y=v=>useLog? T+ph*(1-Math.log10(v+1)/Math.log10(ylim+1)) : T+ph*(1-v/ylim);
+  const path=pts=>pts.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join(' ');
+  const area=(up,lo)=>path(up)+' '+lo.slice().reverse().map(p=>'L'+X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join(' ')+' Z';
+  let g=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(m.label)} pályaév szerint">`;
+  // y ticks
+  const ticks=useLog? Array.from({length:Math.log10(ylim+1)|0},(_,i)=>Math.pow(10,i+1)-1).concat([0]) : [0,.25,.5,.75,1].map(f=>Math.round(ylim*f));
+  for(const tv of ticks){ if(tv>ylim)continue; const y=Y(tv); g+=`<line x1="${L}" x2="${W-Rr}" y1="${y}" y2="${y}" stroke="var(--rule-2)"/><text x="${L-6}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--ink-3)">${fmt(tv)}</text>`; }
+  for(let t=0;t<=maxAge;t+=5){ g+=`<text x="${X(t)}" y="${H-10}" text-anchor="middle" font-size="11" fill="var(--ink-3)">${t}</text>`; }
+  if(lines[0].length>1){
+    g+=`<path d="${area(lines[5],lines[0])}" fill="var(--band-100)" opacity=".55"/>`;
+    g+=`<path d="${area(lines[4],lines[1])}" fill="var(--band-90)" opacity=".55"/>`;
+    g+=`<path d="${area(lines[3],lines[1])}" fill="var(--band-75)" opacity=".6"/>`;
+    g+=`<path d="${path(lines[2])}" fill="none" stroke="var(--band-50)" stroke-width="2"/>`;
+    g+=`<path d="${path(lines[5])}" fill="none" stroke="var(--red)" stroke-width="1" stroke-dasharray="3 3" opacity=".8"/>`;
+  }
+  if(own.length){ g+=`<path d="${path(own)}" fill="none" stroke="var(--self)" stroke-width="2.2"/>`;
+    const p=own[Math.min(age,own.length-1)]; g+=`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="5.5" fill="var(--self)" stroke="var(--panel)" stroke-width="2"/>`;
+    if(age<=maxAge){ g+=`<line x1="${X(age)}" x2="${X(age)}" y1="${T}" y2="${T+ph}" stroke="var(--self)" stroke-dasharray="2 4" opacity=".7"/>`; } }
+  g+=`<text x="${L}" y="${H-10}" font-size="11" fill="var(--ink-3)" text-anchor="start" dx="-${L-4}">pályaév</text>`;
+  return g+'</svg>';
+}
+function rulerSVG(items,selfId){
+  // items: [{id,overall,name}] – helyezés-sáv 0..100(+)
+  const W=1000,H=64; const max=Math.max(100,...items.map(i=>i.overall)); const X=v=>14+(W-28)*Math.min(v,max)/max;
+  let g=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Helyezés a kari mezőnyben">`;
+  for(let d=0;d<=10;d++){ const x=X(d*10); g+=`<line x1="${x}" x2="${x}" y1="18" y2="46" stroke="var(--rule)"/>`; if(d<10) g+=`<text x="${(X(d*10)+X(d*10+10))/2}" y="60" text-anchor="middle" font-size="11" fill="var(--ink-3)">D${10-d}</text>`; }
+  if(max>100){ g+=`<text x="${X(max)}" y="60" text-anchor="end" font-size="11" fill="var(--ink-3)">${fmt(max)}</text>`; }
+  g+=`<line x1="${X(0)}" x2="${X(max)}" y1="32" y2="32" stroke="var(--rule)"/>`;
+  // kernel-dots: osszes kutato
+  const jit=mulberry(7);
+  for(const it of items){ if(it.id===selfId) continue; g+=`<circle cx="${X(it.overall).toFixed(1)}" cy="${(32+(jit()-0.5)*18).toFixed(1)}" r="2.4" fill="var(--navy)" opacity=".28"/>`; }
+  const me=items.find(i=>i.id===selfId);
+  if(me){ g+=`<line x1="${X(me.overall)}" x2="${X(me.overall)}" y1="8" y2="54" stroke="var(--self)" stroke-width="2"/><circle cx="${X(me.overall)}" cy="32" r="7" fill="var(--self)" stroke="var(--panel)" stroke-width="2.5"/>`; }
+  return g+'</svg>';
+}
+
+/* ============================ KUTATÓ NÉZET ============================ */
+function renderPerson(){
+  const el=$('#person'); const a=S.sel;
+  if(!a){ el.innerHTML=`<p class="empty">Írj be egy nevet vagy MTMT-azonosítót. A kutató pályaévenkénti értékeit a kar azonos pályaévű kutatóinak eloszlásához képest mutatjuk, és az összpontszámból decilist számolunk.</p>`; return; }
+  const useBreak=$('#useBreak').checked, logY=$('#logY').checked;
+  const cur=ageOf(a,useBreak); const want=parseInt($('#ageAt').value,10);
+  const age=isNaN(want)? cur : Math.min(cur,Math.max(0,want));
+  if(!isNaN(want)&&want>cur) toast(`Ez a kutató ${cur}. pályaévénél tart; ezt mutatjuk.`);
+  const e=evaluate(a,age,useBreak);
+  const ranked=evalPool(age,useBreak).map(x=>({id:x.a.mtid,overall:x.e.overall})).sort((x,y)=>y.overall-x.overall);
+  const place=ranked.findIndex(r=>r.id===a.mtid)+1;
+  const pct=k=>fmt(e.pct[k],1);
+  el.innerHTML=`
+  <div class="who">
+    <div>
+      <h2>${esc(a.name)}</h2>
+      <div class="meta">MTMT <a href="https://m2.mtmt.hu/gui2/?type=authors&mode=browse&sel=${a.mtid}" target="_blank" rel="noopener">${a.mtid}</a>${a.dept?` &nbsp;|&nbsp; ${esc(a.dept)}`:''}
+      <br>Első cikk: ${a.firstYear} &nbsp;|&nbsp; ${age===cur?`${cur}. pályaév (${S.data.meta.refYear})`:`${age}. pályaév (${e.year}), aktuálisan ${cur}.`}${useBreak&&a.careerBreak?` &nbsp;|&nbsp; pályakihagyás: ${a.careerBreak} év`:''}
+      &nbsp;|&nbsp; ${a.npub||'–'} folyóiratcikk${a.lastModified?` &nbsp;|&nbsp; MTMT frissítve: ${a.lastModified}`:''}</div>
+    </div>
+    <div class="decile num">D${e.decile}<small>${place}. a ${e.n} azonos pályaévű SZAOK-kutató közül</small></div>
+  </div>
+  <div class="ruler">${rulerSVG(ranked,a.mtid)}
+    <div class="legend"><span><i style="background:var(--self)"></i>${esc(a.name)} – összpontszám ${fmt(e.overall,1)}</span><span><i style="background:var(--navy);opacity:.4"></i>a kar többi kutatója ugyanebben a pályaévben (n = ${e.n})</span></div>
+  </div>
+  <div class="scores">
+    <div class="score"><div class="lab">h-index</div><div class="val num">${fmt(e.vals.h)}</div><div class="sub">${pct('h')}. percentilis</div></div>
+    <div class="score"><div class="lab">Független idézet ${e.year}-ben (vezető szerzős ×2)</div><div class="val num">${fmt(e.vals.cit)}</div><div class="sub">${pct('cit')}. percentilis</div></div>
+    <div class="score"><div class="lab">Vezető szerzős Q1 cikk, ${e.year-4}–${e.year}</div><div class="val num">${fmt(e.vals.q1)}</div><div class="sub">${pct('q1')}. percentilis, kétszeres súllyal</div></div>
+    <div class="score"><div class="lab">Kiemelkedő hatású cikk (10 év, ≥ ${S.data.meta.hiThreshold} független idézet/év)</div><div class="val num">${fmt(e.hi)}</div><div class="sub">+${fmt(4*e.hi)} pont</div></div>
+    <div class="score total"><div class="lab">Összpontszám</div><div class="val num">${fmt(e.overall,1)}</div><div class="sub">(${pct('h')} + ${pct('cit')} + 2 × ${pct('q1')}) / 4 + 4 × ${e.hi}</div></div>
+  </div>
+  <div class="charts">
+    ${METRICS.map(m=>`<div class="chart"><h3>${m.label}</h3><p>Sávok: a kar 0–100., 25–90. és 25–75. percentilise pályaévenként; vastag vonal a medián, szaggatott piros a kari maximum.</p>${chartSVG(m,a,age,useBreak,logY)}<div class="cap">Sárga: ${esc(a.name)} saját pályája, pont: a vizsgált pályaév.</div></div>`).join('')}
+  </div>`;
+}
+function selectAuthor(a){ S.sel=a; $('#q').value=a? `${a.name} (${a.mtid})`:''; $('#sug').hidden=true; renderPerson(); }
+function suggest(q){
+  const ul=$('#sug'); q=q.trim().toLowerCase(); if(!q){ul.hidden=true;return;}
+  const hits=S.data.authors.filter(a=>a.name.toLowerCase().includes(q)||String(a.mtid).startsWith(q)).slice(0,12);
+  if(!hits.length){ul.hidden=true;return;}
+  ul.innerHTML=hits.map(a=>`<li data-id="${a.mtid}">${esc(a.name)}<span>${a.mtid}${a.dept?' – '+esc(a.dept.split(';')[0]):''}</span></li>`).join('');
+  ul.hidden=false;
+}
+
+/* ============================ TOPLISTA ============================ */
+let topRows=[];
+function buildTopAges(){
+  const sel=$('#topAge'); const useBreak=$('#useBreak').checked;
+  const maxAge=Math.max(...S.data.authors.map(x=>ageOf(x,useBreak)));
+  let o=`<option value="cur">aktuális pályaév (mindenki a sajátjában)</option>`;
+  for(let t=1;t<=maxAge;t++){ const n=pool(t,useBreak).n; o+=`<option value="${t}">${t}. pályaév (n = ${n})</option>`; }
+  sel.innerHTML=o;
+}
+function renderTop(){
+  const useBreak=$('#useBreak').checked; const v=$('#topAge').value;
+  let rows;
+  if(v==='cur'){ rows=S.data.authors.map(a=>({a,e:evaluate(a,ageOf(a,useBreak),useBreak)})); $('#topNote').textContent=`Mindenki a saját aktuális pályaévének kari referenciájához mérve (${S.data.meta.refYear}). Az összpontszám így pályaévtől függetlenül összevethető.`; }
+  else { const age=+v; rows=evalPool(age,useBreak); const yr=S.data.meta.refYear; $('#topNote').textContent=`A kar ${rows.length} kutatója, aki elérte a ${age}. pályaévet, a saját ${age}. pályaévében mért értékekkel. Aki ma ennél régebb óta publikál, annak régebbi naptári évre vonatkozik az adat.`; }
+  const f=$('#topFilter').value.trim().toLowerCase();
+  if(f) rows=rows.filter(r=>r.a.name.toLowerCase().includes(f)||(r.a.dept||'').toLowerCase().includes(f)||String(r.a.mtid).includes(f));
+  const {key,dir}=S.topSort;
+  const g=r=> key==='name'?r.a.name: key==='mtid'?r.a.mtid: key==='dept'?(r.a.dept||''): key==='age'?r.e.age: key==='year'?r.e.year: key==='n'?r.e.n: key==='hi'?r.e.hi: key==='overall'?r.e.overall: key==='decile'?-r.e.decile: key.startsWith('p_')?r.e.pct[key.slice(2)]: r.e.vals[key];
+  rows.sort((x,y)=>{const a=g(x),b=g(y); if(typeof a==='string') return dir*a.localeCompare(b,'hu'); return dir*((a??-1)-(b??-1));});
+  topRows=rows;
+  const n=+$('#topN').value; const show=n?rows.slice(0,n):rows;
+  const cols=[['rank','#'],['name','Név'],['mtid','MTMT'],['dept','Szervezeti egység'],['age','Pályaév'],['year','Év'],['h','h'],['p_h','P h'],['cit','Idézet/év'],['p_cit','P idézet'],['q1','Q1 (5 év)'],['p_q1','P Q1'],['hi','Kiemelk.'],['overall','Összpont'],['decile','Decilis']];
+  let html='<thead><tr>'+cols.map(([k,l])=>`<th data-k="${k}" class="${['rank','name','mtid','dept'].includes(k)?'':'n'} ${S.topSort.key===k?'sorted':''}">${l}${S.topSort.key===k?(dir<0?' ↓':' ↑'):''}</th>`).join('')+'</tr></thead><tbody>';
+  const rankMap=new Map(); rows.slice().sort((x,y)=>y.e.overall-x.e.overall).forEach((r,i)=>rankMap.set(r.a.mtid,i+1));
+  for(const r of show){ const e=r.e,a=r.a;
+    html+=`<tr class="${S.sel&&S.sel.mtid===a.mtid?'me':''}"><td class="rank">${rankMap.get(a.mtid)}</td><td><a href="#" data-sel="${a.mtid}">${esc(a.name)}</a></td><td><a href="https://m2.mtmt.hu/gui2/?type=authors&mode=browse&sel=${a.mtid}" target="_blank" rel="noopener">${a.mtid}</a></td><td title="${esc(a.dept||'')}">${esc((a.dept||'').split(';')[0])}</td><td class="n">${e.age}</td><td class="n">${e.year}</td><td class="n">${fmt(e.vals.h)}</td><td class="n">${fmt(e.pct.h,0)}</td><td class="n">${fmt(e.vals.cit)}</td><td class="n">${fmt(e.pct.cit,0)}</td><td class="n">${fmt(e.vals.q1)}</td><td class="n">${fmt(e.pct.q1,0)}</td><td class="n">${fmt(e.hi)}</td><td class="n num" style="font-size:16px">${fmt(e.overall,1)}</td><td class="n"><span class="pill d${e.decile}">D${e.decile}</span></td></tr>`; }
+  html+='</tbody>'; $('#topTable').innerHTML=html;
+}
+function csvOf(rows){
+  const head=['helyezés','név','mtmt_id','szervezeti_egység','pályaév','naptári_év','n_referencia','h','P_h','idézet_év','P_idézet','Q1_5év','P_Q1','kiemelkedő','összpontszám','decilis'];
+  const sorted=rows.slice().sort((x,y)=>y.e.overall-x.e.overall);
+  const lines=[head.join(';')].concat(sorted.map((r,i)=>[i+1,r.a.name,r.a.mtid,(r.a.dept||'').replace(/;/g,','),r.e.age,r.e.year,r.e.n,r.e.vals.h,r.e.pct.h.toFixed(1),r.e.vals.cit,r.e.pct.cit.toFixed(1),r.e.vals.q1,r.e.pct.q1.toFixed(1),r.e.hi,r.e.overall.toFixed(2),'D'+r.e.decile].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')));
+  return '\uFEFF'+lines.join('\n');
+}
+function download(name,text){ const b=new Blob([text],{type:'text/csv;charset=utf-8'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),1000); }
+
+/* ============================ ÖSSZEHASONLÍTÁS ============================ */
+let cmpRows=[];
+function renderCompare(){
+  const ids=[...new Set(($('#cmpIds').value.match(/\d{5,}/g)||[]).map(Number))];
+  const useBreak=$('#useBreak').checked;
+  const rows=ids.map(id=>S.idx.get(id)).filter(Boolean).map(a=>({a,e:evaluate(a,ageOf(a,useBreak),useBreak)}));
+  const missing=ids.filter(id=>!S.idx.has(id));
+  cmpRows=rows;
+  const out=$('#cmpOut');
+  if(!rows.length){ out.innerHTML=`<p class="empty">${ids.length?'Egyik azonosító sincs a kari adatállományban.':'Adj meg legalább egy MTMT-azonosítót.'}</p>`; return; }
+  rows.sort((x,y)=>y.e.overall-x.e.overall);
+  const items=rows.map(r=>({id:r.a.mtid,overall:r.e.overall}));
+  let html=missing.length?`<p class="note" style="color:var(--red)">Nincs az adatállományban: ${missing.join(', ')}</p>`:'';
+  html+=`<div class="ruler">${rulerSVG(items,null).replace('</svg>', items.map((it,i)=>{const max=Math.max(100,...items.map(j=>j.overall));const x=14+972*Math.min(it.overall,max)/max;return `<circle cx="${x}" cy="32" r="7" fill="var(--self)" stroke="var(--panel)" stroke-width="2"/><text x="${x}" y="${i%2?12:52}" text-anchor="middle" font-size="11" fill="var(--ink)">${esc(rows[i].a.name.split(' ')[0])}</text>`;}).join('')+'</svg>')}</div>`;
+  html+=`<div class="tablewrap"><table><thead><tr><th>Név</th><th>MTMT</th><th class="n">Pályaév</th><th class="n">n</th><th class="n">h</th><th class="n">P h</th><th class="n">Idézet/év</th><th class="n">P idézet</th><th class="n">Q1 (5 év)</th><th class="n">P Q1</th><th class="n">Kiemelk.</th><th class="n">Összpont</th><th class="n">Decilis</th></tr></thead><tbody>`;
+  for(const r of rows){const e=r.e,a=r.a; html+=`<tr><td><a href="#" data-sel="${a.mtid}">${esc(a.name)}</a></td><td>${a.mtid}</td><td class="n">${e.age}</td><td class="n">${e.n}</td><td class="n">${fmt(e.vals.h)}</td><td class="n">${fmt(e.pct.h,0)}</td><td class="n">${fmt(e.vals.cit)}</td><td class="n">${fmt(e.pct.cit,0)}</td><td class="n">${fmt(e.vals.q1)}</td><td class="n">${fmt(e.pct.q1,0)}</td><td class="n">${fmt(e.hi)}</td><td class="n num" style="font-size:16px">${fmt(e.overall,1)}</td><td class="n"><span class="pill d${e.decile}">D${e.decile}</span></td></tr>`;}
+  out.innerHTML=html+'</tbody></table></div>';
+}
+
+/* ============================ ADATOK ============================ */
+function validate(d){
+  if(!d||!Array.isArray(d.authors)||!d.meta) throw new Error('Hiányzik a "meta" vagy az "authors" mező.');
+  for(const a of d.authors){ for(const k of ['h','cit','q1','hi']) if(!Array.isArray(a[k])) throw new Error(`A(z) ${a.mtid} szerzőnél hiányzik a "${k}" tömb.`); a.mtid=Number(a.mtid); a.careerBreak=a.careerBreak||0; }
+  if(!d.meta.refYear) d.meta.refYear=new Date().getFullYear()-1;
+  d.meta.hiThreshold=d.meta.hiThreshold||13;
+  return d;
+}
+function setData(d,demo){
+  S.data=d; S.demo=demo; S.poolCache.clear(); S.idx=new Map(d.authors.map(a=>[a.mtid,a])); S.sel=null; $('#q').value='';
+  $('#status').innerHTML=`${demo?'<span class="demo">Demó adatok</span> – ':''}<b>${esc(d.meta.institute||'')}</b><br>${d.authors.length} kutató, referenciaév ${d.meta.refYear}${d.meta.generated?', frissítve '+esc(d.meta.generated):''}`;
+  $('#metaKv').innerHTML=Object.entries(d.meta).filter(([k])=>k!=='failed').map(([k,v])=>`<div>${esc(k)}</div><div>${esc(typeof v==='object'?JSON.stringify(v):v)}</div>`).join('')+(d.meta.failed&&d.meta.failed.length?`<div>failed</div><div>${d.meta.failed.length} szerző letöltése sikertelen</div>`:'');
+  buildTopAges(); renderPerson(); renderTop(); $('#cmpOut').innerHTML='';
+  if(!demo){ try{ localStorage.setItem('szaok_data',JSON.stringify(d)); }catch(e){ toast('Az adat túl nagy a helyi mentéshez; a frissítés után újra be kell tölteni.'); } }
+}
+function loadFile(f){
+  const r=new FileReader();
+  r.onload=()=>{ try{ setData(validate(JSON.parse(r.result)),false); toast(`Betöltve: ${f.name}`); showTab('kutato'); }catch(e){ toast('Nem sikerült beolvasni: '+e.message); } };
+  r.readAsText(f);
+}
+
+/* ============================ UI ============================ */
+function showTab(id){ document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===id)); document.querySelectorAll('main section').forEach(s=>s.hidden=s.id!=='tab-'+id); }
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+$('#q').addEventListener('input',e=>suggest(e.target.value));
+$('#q').addEventListener('keydown',e=>{ if(e.key==='Enter'){ const q=e.target.value.trim(); const id=Number(q.match(/\d{5,}/)?.[0]); const a=S.idx.get(id)||S.data.authors.find(x=>x.name.toLowerCase()===q.toLowerCase())||S.data.authors.find(x=>x.name.toLowerCase().includes(q.toLowerCase())); if(a) selectAuthor(a); else toast('Nincs ilyen kutató a kari adatállományban.'); } if(e.key==='Escape') $('#sug').hidden=true; });
+$('#sug').addEventListener('click',e=>{ const li=e.target.closest('li'); if(li) selectAuthor(S.idx.get(Number(li.dataset.id))); });
+document.addEventListener('click',e=>{ if(!e.target.closest('.suggest')) $('#sug').hidden=true; const s=e.target.closest('[data-sel]'); if(s){ e.preventDefault(); selectAuthor(S.idx.get(Number(s.dataset.sel))); showTab('kutato'); window.scrollTo({top:0}); } });
+$('#ageAt').addEventListener('input',renderPerson); $('#logY').addEventListener('change',renderPerson);
+$('#useBreak').addEventListener('change',()=>{ S.poolCache.clear(); buildTopAges(); renderPerson(); renderTop(); if(cmpRows.length) renderCompare(); });
+$('#topAge').addEventListener('change',renderTop); $('#topFilter').addEventListener('input',renderTop); $('#topN').addEventListener('change',renderTop);
+$('#topTable').addEventListener('click',e=>{ const th=e.target.closest('th'); if(!th||th.dataset.k==='rank') return; const k=th.dataset.k; if(S.topSort.key===k) S.topSort.dir*=-1; else S.topSort={key:k,dir:['name','dept'].includes(k)?1:-1}; renderTop(); });
+$('#topCsv').addEventListener('click',()=>download(`szaok_toplista_${$('#topAge').value}_palyaev.csv`,csvOf(topRows)));
+$('#cmpRun').addEventListener('click',renderCompare); $('#cmpIds').addEventListener('keydown',e=>{if(e.key==='Enter')renderCompare();});
+$('#cmpCsv').addEventListener('click',()=>{ if(!cmpRows.length) return toast('Előbb futtass összehasonlítást.'); download('szaok_osszehasonlitas.csv',csvOf(cmpRows)); });
+$('#file').addEventListener('change',e=>{ if(e.target.files[0]) loadFile(e.target.files[0]); });
+const drop=$('#drop'); ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');})); ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');})); drop.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f) loadFile(f); });
+$('#loadDemo').addEventListener('click',()=>{ setData(makeDemo(),true); toast('Demó adatok betöltve.'); });
+$('#clearStore').addEventListener('click',()=>{ try{localStorage.removeItem('szaok_data');}catch(e){} setData(makeDemo(),true); toast('Helyi mentés törölve.'); });
+
+/* indítás */
+(function init(){
+  let baked=null; try{ const t=document.getElementById('szaok-data').textContent.trim(); if(t&&t!=='null') baked=validate(JSON.parse(t)); }catch(e){ baked=null; }
+  let stored=null; try{ const s=localStorage.getItem('szaok_data'); if(s) stored=validate(JSON.parse(s)); }catch(e){ stored=null; }
+  if(baked&&(!stored||(stored.meta.generated||'')<=(baked.meta.generated||''))){ setData(baked,false); }
+  else if(stored){ setData(stored,false); } else { setData(makeDemo(),true); }
+  // GitHub Pages / saját szerver: azonos eredetű adatfájl (a legfrissebb nyer)
+  if(/^https?:$/.test(location.protocol) && !/claude\.ai$/.test(location.hostname)){
+    fetch('data/szaok_data.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(d=>{
+      if(!d) return; d=validate(d);
+      if(S.demo || (d.meta.generated||'') >= (S.data.meta.generated||'')){ setData(d,false); toast('Kari adatok betöltve ('+(d.meta.generated||'')+').'); }
+    }).catch(()=>{});
+  }
+  const h=(location.hash||'').replace('#',''); if(['kutato','toplista','osszehasonlitas','modszertan','adatok'].includes(h)) showTab(h);
+})();
+</script>
+</body>
+</html>
