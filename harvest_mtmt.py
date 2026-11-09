@@ -130,7 +130,7 @@ def institute_tree(root_id):
     return ids
 
 
-def authors_from_institute_publications(root_id, affil_regex):
+def authors_from_institute_publications(root_id, affil_regex, workers=3):
     """Robust path: list every journal article filed under the institute (MTMT
     aggregates child institutes), fetch each record (cached – reused later),
     and collect the MTMT IDs of authors whose authorship affiliation matches
@@ -138,18 +138,27 @@ def authors_from_institute_publications(root_id, affil_regex):
     rx = re.compile(affil_regex)
     conds = [f"institutes;eq;{root_id}", "published;eq;true", "core;eq;true", "type;eq;24"]
     authors, n = {}, 0
-    for item in paged(f"{API}/publication", conds, size=200):
-        pid = item.get("mtid")
-        if not pid:
-            continue
-        rec = item if item.get("authorships") else publication_record(pid)
-        n += 1
-        for a in rec.get("authorships") or []:
-            au = a.get("author") or {}
-            if au.get("mtid") and rx.search(a.get("label") or ""):
-                authors[au["mtid"]] = au
-        if n % 200 == 0:
-            print(f"  {n} közlemény átnézve, {len(authors)} kari szerző eddig")
+    items = [it for it in paged(f"{API}/publication", conds, size=200) if it.get("mtid")]
+    print(f"  {len(items)} kari közlemény a listában, rekordok letöltése ({workers} szál)...")
+
+    def fetch(item):
+        return item if item.get("authorships") else publication_record(item["mtid"])
+
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        futs = [ex.submit(fetch, it) for it in items]
+        for fut in as_completed(futs):
+            n += 1
+            try:
+                rec = fut.result()
+            except Exception as e:
+                print(f"  HIBA (közlemény): {e}")
+                continue
+            for a in rec.get("authorships") or []:
+                au = a.get("author") or {}
+                if au.get("mtid") and rx.search(a.get("label") or ""):
+                    authors[au["mtid"]] = au
+            if n % 500 == 0:
+                print(f"  {n}/{len(items)} közlemény átnézve, {len(authors)} kari szerző eddig")
     print(f"  {n} közlemény, {len(authors)} kari szerző")
     return authors
 
@@ -414,7 +423,7 @@ def main():
             print(f"  kiválasztva: {cands[0]['label']} ({args.institute})")
         args.institute = int(args.institute)
         print("Kari szerzők gyűjtése a kar közleményeiből...")
-        auth = authors_from_institute_publications(args.institute, args.affil_regex)
+        auth = authors_from_institute_publications(args.institute, args.affil_regex, args.workers)
         if not auth:
             print("Tartalék út: intézményfa + szerzőlista...")
             tree = institute_tree(args.institute)

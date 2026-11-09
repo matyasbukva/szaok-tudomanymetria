@@ -2,6 +2,10 @@ name: MTMT harvest + GitHub Pages
 
 on:
   workflow_dispatch:
+    inputs:
+      round:
+        description: "Hányadik folytatás (automatikusan nő, kézzel hagyd 1-en)"
+        default: "1"
   schedule:
     - cron: "0 3 * * 1"   # hétfő 03:00 UTC – heti frissítés
   push:
@@ -12,6 +16,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  actions: write          # a félbemaradt letöltés automatikus folytatásához
 
 concurrency:
   group: pages
@@ -27,12 +32,15 @@ jobs:
         with: { python-version: "3.12" }
       - run: pip install requests
       - name: MTMT rekord-cache visszatöltése
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: cache
           key: mtmt-cache-${{ github.run_id }}
           restore-keys: mtmt-cache-
       - name: Letöltés és számítás
+        # 5 óra után megáll, hogy a már letöltött rekordok mentésére biztosan maradjon idő;
+        # a következő futás onnan folytatja.
+        timeout-minutes: 300
         env:
           INSTITUTE: ${{ vars.MTMT_INSTITUTE_ID || 'auto' }}
           REF_YEAR: ${{ vars.REF_YEAR || '' }}
@@ -42,6 +50,24 @@ jobs:
           if [ -n "$REF_YEAR" ]; then ARGS="$ARGS --ref-year $REF_YEAR"; fi
           python -u harvest_mtmt.py $ARGS
           if [ -f szaok_author_ids.txt ]; then mv szaok_author_ids.txt data/szaok_author_ids_felderitett.txt; fi
+      - name: Rekord-cache mentése (félbeszakadás esetén is)
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: cache
+          key: mtmt-cache-${{ github.run_id }}
+      - name: Folytatás automatikus indítása, ha nem készült el
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ROUND: ${{ inputs.round || '1' }}
+        run: |
+          if [ "$ROUND" -lt 6 ]; then
+            echo "Nem készült el, folytatás indítása (kör: $((ROUND + 1)))"
+            gh workflow run harvest.yml --repo "$GITHUB_REPOSITORY" --ref main -f round=$((ROUND + 1))
+          else
+            echo "6 kör után sem készült el – kézi ellenőrzés szükséges."
+          fi
       - name: Adat commitolása
         run: |
           git config user.name "szaok-bot"
@@ -50,9 +76,10 @@ jobs:
           git diff --cached --quiet || git commit -m "MTMT adatfrissítés $(date -u +%F)"
           git push
       - name: Pages csomag
-        uses: actions/upload-pages-artifact@v3
+        run: mkdir -p _site && cp index.html _site/ && cp -r data _site/
+      - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
   deploy:
     needs: harvest
     runs-on: ubuntu-latest
