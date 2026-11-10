@@ -26,6 +26,8 @@ jobs:
   harvest:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+    outputs:
+      done: ${{ steps.harvest.outputs.done }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,18 +40,30 @@ jobs:
           key: mtmt-cache-${{ github.run_id }}
           restore-keys: mtmt-cache-
       - name: Letöltés és számítás
-        # 5 óra után megáll, hogy a már letöltött rekordok mentésére biztosan maradjon idő;
-        # a következő futás onnan folytatja.
+        id: harvest
+        # A script 4 ó 40 perc után magától leáll (a GitHub 6 órás korlátja előtt), hogy a
+        # már letöltött rekordok biztosan elmentődjenek; a következő kör onnan folytatja.
         timeout-minutes: 300
         env:
           INSTITUTE: ${{ vars.MTMT_INSTITUTE_ID || 'auto' }}
           REF_YEAR: ${{ vars.REF_YEAR || '' }}
         run: |
-          ARGS="--institute $INSTITUTE --workers 3 --out data/szaok_data.json"
-          if [ -f data/szaok_author_ids.txt ]; then ARGS="--authors data/szaok_author_ids.txt --workers 3 --out data/szaok_data.json"; fi
+          ARGS="--institute $INSTITUTE --workers 5 --out data/szaok_data.json"
+          if [ -f data/szaok_author_ids.txt ]; then ARGS="--authors data/szaok_author_ids.txt --workers 5 --out data/szaok_data.json"; fi
           if [ -n "$REF_YEAR" ]; then ARGS="$ARGS --ref-year $REF_YEAR"; fi
-          python -u harvest_mtmt.py $ARGS
+          set +e
+          timeout -k 60s 280m python -u harvest_mtmt.py $ARGS
+          rc=$?
+          set -e
           if [ -f szaok_author_ids.txt ]; then mv szaok_author_ids.txt data/szaok_author_ids_felderitett.txt; fi
+          if [ $rc -eq 124 ] || [ $rc -eq 137 ]; then
+            echo "Időkorlát: a letöltés a következő körben folytatódik."
+            echo "done=false" >> "$GITHUB_OUTPUT"
+          elif [ $rc -ne 0 ]; then
+            exit $rc
+          else
+            echo "done=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Rekord-cache mentése (félbeszakadás esetén is)
         if: always()
         uses: actions/cache/save@v4
@@ -57,18 +71,19 @@ jobs:
           path: cache
           key: mtmt-cache-${{ github.run_id }}
       - name: Folytatás automatikus indítása, ha nem készült el
-        if: failure()
+        if: steps.harvest.outputs.done == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
           ROUND: ${{ inputs.round || '1' }}
         run: |
-          if [ "$ROUND" -lt 6 ]; then
+          if [ "$ROUND" -lt 8 ]; then
             echo "Nem készült el, folytatás indítása (kör: $((ROUND + 1)))"
             gh workflow run harvest.yml --repo "$GITHUB_REPOSITORY" --ref main -f round=$((ROUND + 1))
           else
-            echo "6 kör után sem készült el – kézi ellenőrzés szükséges."
+            echo "8 kör után sem készült el – kézi ellenőrzés szükséges."
           fi
       - name: Adat commitolása
+        if: steps.harvest.outputs.done == 'true'
         run: |
           git config user.name "szaok-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -76,12 +91,15 @@ jobs:
           git diff --cached --quiet || git commit -m "MTMT adatfrissítés $(date -u +%F)"
           git push
       - name: Pages csomag
+        if: steps.harvest.outputs.done == 'true'
         run: mkdir -p _site && cp index.html _site/ && cp -r data _site/
       - uses: actions/upload-pages-artifact@v3
+        if: steps.harvest.outputs.done == 'true'
         with:
           path: _site
   deploy:
     needs: harvest
+    if: needs.harvest.outputs.done == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

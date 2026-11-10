@@ -34,6 +34,7 @@ import json
 import os
 import re
 import sys
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
@@ -184,16 +185,35 @@ def authors_of_institutes(inst_ids):
     return authors
 
 
+# ------------------------------------------------------------------- cache
+def cache_load(path):
+    """Cached record, or None if missing or unreadable (e.g. cut off mid-write)."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return None
+    except (ValueError, OSError):
+        return None
+
+
+def cache_store(path, rec):
+    """Atomic write: a killed process never leaves a half-written file behind."""
+    tmp = f"{path}.{os.getpid()}.{threading.get_ident()}.tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(rec, f, ensure_ascii=False)
+    os.replace(tmp, path)
+
+
 # ------------------------------------------------------------------- authors
 def author_record(mtid):
     path = f"{CACHE}/author_{mtid}.json"
-    if os.path.exists(path):
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
+    rec = cache_load(path)
+    if rec is not None:
+        return rec
     data = get(f"{API}/author/{mtid}", [("format", "json"), ("labelLang", "hun")])
     rec = (data or {}).get("content") or data or {}
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(rec, f, ensure_ascii=False)
+    cache_store(path, rec)
     return rec
 
 
@@ -208,13 +228,12 @@ def author_publication_ids(mtid):
 
 def publication_record(pid):
     path = f"{CACHE}/pub_{pid}.json"
-    if os.path.exists(path):
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
+    rec = cache_load(path)
+    if rec is not None:
+        return rec
     data = get(f"{API}/publication/{pid}", [("format", "json"), ("labelLang", "hun")])
     rec = (data or {}).get("content") or data or {}
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(rec, f, ensure_ascii=False)
+    cache_store(path, rec)
     return rec
 
 
